@@ -1,0 +1,26 @@
+# Where are all the schema files located? globs are supported eg  src/**/*.graphqls
+schema:
+  - graph/*.graphqls
+
+# Where should the generated server code go?
+exec:
+  filename: graph/generated/generated.go
+  package: generated
+
+model:
+  filename: graph/model/models_gen.go
+  package: model
+models:
+  User:
+    model: github.com/Kostaq1234/graphql/graph/models.User
+  Meetup:
+      model: github.com/Kostaq1234/graphql/graph/models.Meetup
+# Where should the resolver implementations go?
+resolver:
+  layout: follow-schema
+  dir: graph
+  package: graph
+
+autobind:
+  - "github.com/Kostaq1234/graphql/graph/model"
+
