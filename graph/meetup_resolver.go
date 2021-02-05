@@ -9,7 +9,7 @@ type meetupResolver struct{ *Resolver }
 
 func (r *meetupResolver) User(ctx context.Context, obj *models.Meetup) (*models.User, error) {
 
-	return r.UserRepo.GetUserById(obj.UserId)
+	return getUserLoader(ctx).Load(obj.UserId)
 }
 func (r *Resolver) Meetup() *meetupResolver {
 
