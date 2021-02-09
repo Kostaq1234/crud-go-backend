@@ -1,8 +1,12 @@
 package main
 
 import (
+	customMiddleware "github.com/Kostaq1234/graphql/middleware"
 	"github.com/Kostaq1234/graphql/postgres"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-pg/pg"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 	"os"
@@ -28,7 +32,18 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{MeetupsRepo: postgres.MeetupsRepo{DB: DB}, UserRepo: postgres.UserRepo{DB: DB}}}))
+	userRepo := postgres.UserRepo{DB: DB}
+	router := chi.NewRouter()
+	router.Use(cors.New(cors.Options{
+		Debug:            true,
+		AllowCredentials: true,
+		AllowedOrigins:   []string{"http://localhost:8080"},
+	}).Handler)
+	router.Use(middleware.RequestID)
+	router.Use(middleware.Logger)
+	router.Use(customMiddleware.AuthMiddleware(userRepo))
+
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{MeetupsRepo: postgres.MeetupsRepo{DB: DB}, UserRepo: userRepo}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", graph.DataloaderMiddleware(DB, srv))
