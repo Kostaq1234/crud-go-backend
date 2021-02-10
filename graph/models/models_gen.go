@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type LoginInput struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type AuthResponse struct {
 	AuthToken *AuthToken `json:"authToken"`
 	User      *User      `json:"user"`

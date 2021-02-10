@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Kostaq1234/graphql/domain"
 	customMiddleware "github.com/Kostaq1234/graphql/middleware"
 	"github.com/Kostaq1234/graphql/postgres"
 	"github.com/go-chi/chi"
@@ -32,7 +33,7 @@ func main() {
 		port = defaultPort
 	}
 
-	userRepo := postgres.UserRepo{DB: DB}
+	//userRepo := postgres.UserRepo{DB: DB}
 	router := chi.NewRouter()
 	router.Use(cors.New(cors.Options{
 		Debug:            true,
@@ -41,13 +42,13 @@ func main() {
 	}).Handler)
 	router.Use(middleware.RequestID)
 	router.Use(middleware.Logger)
-	router.Use(customMiddleware.AuthMiddleware(userRepo))
+	router.Use(customMiddleware.AuthMiddleware(postgres.UserRepo{DB: DB}))
+	d := domain.NewDomain(postgres.UserRepo{DB: DB}, postgres.MeetupsRepo{DB: DB})
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{Domain: d}}))
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{MeetupsRepo: postgres.MeetupsRepo{DB: DB}, UserRepo: userRepo}}))
-
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", graph.DataloaderMiddleware(DB, srv))
+	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	router.Handle("/query", graph.DataloaderMiddleware(DB, srv))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }

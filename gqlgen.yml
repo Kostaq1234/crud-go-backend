@@ -8,13 +8,13 @@ exec:
   package: generated
 
 model:
-  filename: graph/models/models_gen.go
-  package: models
+  filename: graph/model/models_gen.go
+  package: model
 models:
   User:
-    model: github.com/Kostaq1234/crud-go-backend/graph/models.User
+    model: github.com/Kostaq1234/graphql/graph/models.User
   Meetup:
-      model: github.com/Kostaq1234/crud-go-backend/graph/models.Meetup
+    model: github.com/Kostaq1234/graphql/graph/models.Meetup
 # Where should the resolver implementations go?
 resolver:
   layout: follow-schema
@@ -22,5 +22,4 @@ resolver:
   package: graph
 
 autobind:
-  - "github.com/Kostaq1234/gcrud-go-backend/graph/model"
-
+  - "github.com/Kostaq1234/graphql/graph/model"

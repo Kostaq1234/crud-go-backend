@@ -11,6 +11,10 @@ type AuthResponse{
   user:User!
 }
 
+input LoginInput{
+  email:String!
+  password:String!
+}
 
 type User {
   id: ID!
@@ -59,4 +63,5 @@ type Mutation{
   updateMeetup(id: ID!,input:UpdateMeetup!):Meetup!
   deleteMeetup(id:ID!):Boolean!
   register(input: RegisterInput!):AuthResponse!
+  login(input: LoginInput!):AuthResponse!
 }

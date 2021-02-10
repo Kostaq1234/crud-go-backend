@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/Kostaq1234/graphql/graph/model"
+	//"github.com/Kostaq1234/graphql/graph/model"
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 	"os"
@@ -31,7 +31,7 @@ func (u User) HashPassword(password string) error {
 	return nil
 }
 
-func (u User) GenToken() (*model.AuthToken, error) {
+func (u User) GenToken() (*AuthToken, error) {
 	expiredAt := time.Now().Add(time.Hour * 24 * 7) //a week
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		ExpiresAt: expiredAt.Unix(),
@@ -43,8 +43,14 @@ func (u User) GenToken() (*model.AuthToken, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &model.AuthToken{
+	return &AuthToken{
 		AccessToken: accessToken,
 		ExpiredAt:   expiredAt,
 	}, nil
+}
+
+func (u *User) ComparePassword(password string) error {
+	bytePassword := []byte(password)
+	byteHashedPassword := []byte(u.Password)
+	return bcrypt.CompareHashAndPassword(byteHashedPassword, bytePassword)
 }
